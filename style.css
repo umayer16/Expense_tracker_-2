@@ -1,0 +1,455 @@
+/* =============================================
+   Smart Hostel Expense Tracker - Full Style
+   Includes: Dark Mode, Dashboard, AI Card, Mobile First
+   ============================================= */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  color: #333;
+  min-height: 100vh;
+  padding: 15px;
+  transition: background 0.4s ease;
+}
+
+body.dark {
+  background: #121212;
+  color: #e0e0e0;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+
+body.dark .container {
+  background: #1e1e1e;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* Header */
+header {
+  background: linear-gradient(120deg, #4CAF50, #45a049);
+  color: white;
+  padding: 20px;
+  text-align: center;
+  position: relative;
+}
+
+header h1 {
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.header-actions {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.header-actions button {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.header-actions button:hover {
+  background: rgba(255,255,255,0.4);
+}
+
+/* Login Section */
+#loginSection {
+  text-align: center;
+  padding: 40px 20px;
+  background: #f9f9f9;
+}
+
+body.dark #loginSection {
+  background: #222;
+}
+
+#loginSection input {
+  width: 80%;
+  max-width: 320px;
+  padding: 14px;
+  font-size: 1.1rem;
+  margin: 15px 0;
+}
+
+#loginSection button {
+  padding: 14px 30px;
+  font-size: 1.1rem;
+  background: #4CAF50;
+}
+
+/* Main App */
+#appSection {
+  padding: 20px;
+}
+
+/* User Info */
+.user-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+#streak {
+  background: #ff9800;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+#logoutBtn {
+  background: #f44336;
+  padding: 8px 16px;
+}
+
+/* Dashboard Cards */
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.card {
+  background: white;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  text-align: center;
+  font-weight: bold;
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+body.dark .card {
+  background: #2d2d2d;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.warning {
+  background: linear-gradient(135deg, #ff9800, #f57c00) !important;
+  color: white;
+}
+
+.danger {
+  background: linear-gradient(135deg, #f44336, #d32f2f) !important;
+  color: white;
+}
+
+.ai-prediction {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-prediction::after {
+  content: "AI";
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* Quick Add Buttons */
+.quick-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0;
+  justify-content: center;
+}
+
+.quick-add button {
+  background: #2196F3;
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 25px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.quick-add button:hover {
+  background: #1976D2;
+  transform: scale(1.05);
+}
+
+/* Forms */
+.add-form, .filters, .budget-settings {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 20px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+body.dark .add-form,
+body.dark .filters,
+body.dark .budget-settings {
+  background: #2a2a2a;
+}
+
+.add-form input,
+.add-form select,
+.filters input,
+.filters select {
+  padding: 10px;
+  margin: 8px 5px 8px 0;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  width: calc(50% - 10px);
+}
+
+.add-form label {
+  display: block;
+  margin: 10px 0;
+}
+
+.add-form button,
+.budget-settings button {
+  background: #4CAF50;
+  padding: 12px 20px;
+  font-size: 1rem;
+  margin-top: 10px;
+}
+
+/* Table */
+.table-container {
+  overflow-x: auto;
+  margin: 20px 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+body.dark table {
+  background: #2d2d2d;
+}
+
+th {
+  background: #4CAF50;
+  color: white;
+  padding: 14px;
+  text-align: center;
+}
+
+td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+body.dark td {
+  border-bottom: 1px solid #444;
+}
+
+tr:hover {
+  background: #f5f5f5;
+}
+
+body.dark tr:hover {
+  background: #383838;
+}
+
+.expense { color: #f44336; font-weight: bold; }
+.income  { color: #4CAF50; font-weight: bold; }
+
+button {
+  padding: 6px 12px;
+  margin: 0 4px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+button:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+button:nth-child(1) { background: #2196F3; color: white; }
+button:nth-child(2) { background: #f44336; color: white; }
+
+/* Charts */
+.charts {
+  margin: 30px 0;
+  text-align: center;
+}
+
+.charts h3 {
+  margin-bottom: 20px;
+  color: #4CAF50;
+}
+
+canvas {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  max-height: 350px;
+  margin: 15px auto;
+  display: block;
+}
+
+body.dark canvas {
+  background: #2d2d2d;
+}
+
+/* Onboarding Overlay */
+.overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  display: none;
+}
+
+.onboarding-content {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+
+body.dark .onboarding-content {
+  background: #1e1e1e;
+  color: #e0e0e0;
+}
+
+.onboarding-content h2 {
+  color: #4CAF50;
+  margin-bottom: 15px;
+}
+
+.onboarding-content ol {
+  text-align: left;
+  margin: 20px 0;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .add-form input,
+  .add-form select {
+    width: 100%;
+  }
+  
+  .user-info {
+    text-align: center;
+  }
+  
+  #logoutBtn {
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .dashboard {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  header h1 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+  
+  .quick-add {
+    flex-direction: column;
+  }
+  
+  .quick-add button {
+    width: 100%;
+  }
+}
+
+/* Import/Export Styling */
+.import-label {
+  background: #9c27b0;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: inline-block;
+}
+
+.import-label input {
+  display: none;
+}
+
+/* Success & Error Messages */
+.success { color: #4CAF50; font-weight: bold; }
+.error   { color: #f44336; font-weight: bold; }
+
+/* Details/Summary Styling */
+details {
+  margin: 15px 0;
+  background: #f0f0f0;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+body.dark details {
+  background: #333;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: bold;
+  padding: 10px;
+  background: #e0e0e0;
+  border-radius: 8px;
+}
+
+body.dark summary {
+  background: #444;
+}
