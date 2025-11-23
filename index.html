@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Hostel Expense Tracker</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-wallet"></i> Smart Expense Tracker</h1>
+      <div class="header-actions">
+        <button id="themeToggle"><i class="fas fa-moon"></i></button>
+        <button id="onboardingBtn"><i class="fas fa-question-circle"></i></button>
+      </div>
+    </header>
+
+    <!-- Onboarding Overlay -->
+    <div id="onboarding" class="overlay">
+      <div class="onboarding-content">
+        <h2>Welcome! Let's get started</h2>
+        <p>Add expenses easily, set budgets, track streaks, and stay in control!</p>
+        <ol>
+          <li>Log in with your email</li>
+          <li>Use Quick Add buttons</li>
+          <li>Set monthly budgets</li>
+          <li>Earn streaks by logging daily!</li>
+        </ol>
+        <button onclick="closeOnboarding()">Got it!</button>
+      </div>
+    </div>
+
+    <!-- Login -->
+    <section id="loginSection">
+      <h2>Login to Continue</h2>
+      <input type="email" id="emailInput" placeholder="your@email.com">
+      <button onclick="login()">Login / Sign Up</button>
+      <p><small>Your data is private & stored locally</small></p>
+    </section>
+
+    <!-- Main App -->
+    <div id="appSection" style="display:none;">
+      <div class="user-info">
+        <p>Hi, <strong id="userEmail"></strong>! 
+          <span id="streak">Streak: 0 🔥</span>
+        </p>
+        <button id="logoutBtn">Logout</button>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="dashboard">
+        <div class="card"><strong>Total Spent</strong><span id="totalSpent">₹0</span></div>
+        <div class="card"><strong>Income</strong><span id="totalIncome">₹0</span></div>
+        <div class="card"><strong>Balance</strong><span id="balance">₹0</span></div>
+        <div class="card warning" id="budgetStatus">On Track</div>
+      </div>
+
+      <!-- Quick Add Buttons -->
+      <div class="quick-add">
+        <button onclick="quickAdd('Food', 80)">Food</button>
+        <button onclick="quickAdd('Transport', 50)">Transport</button>
+        <button onclick="quickAdd('Snacks', 30)">Snacks</button>
+        <button onclick="quickAdd('Recharge', 199)">Recharge</button>
+      </div>
+
+      <!-- Add Transaction -->
+      <section class="add-form">
+        <h3>Add Transaction</h3>
+        <select id="type">
+          <option value="expense">Expense</option>
+          <option value="income">Income</option>
+        </select>
+        <input type="text" id="description" placeholder="Description (e.g. Mess Fee)">
+        <input type="text" id="category" placeholder="Category" list="catList">
+        <datalist id="catList"></datalist>
+        <input type="number" id="amount" placeholder="Amount">
+        <input type="date" id="date">
+        <label><input type="checkbox" id="recurring"> Recurring (Monthly)</label>
+        <button onclick="addTransaction()">Add</button>
+      </section>
+
+      <!-- Search & Filters -->
+      <div class="filters">
+        <input type="text" id="search" placeholder="Search transactions...">
+        <select id="filterCategory"><option value="">All Categories</option></select>
+        <select id="filterType"><option value="">All Types</option></select>
+        <button onclick="exportCSV()">Export CSV</button>
+        <label class="import-label">
+          Import CSV <input type="file" id="importFile" accept=".csv">
+        </label>
+      </div>
+
+      <!-- Budget Settings -->
+      <details class="budget-settings">
+        <summary><i class="fas fa-cog"></i> Set Monthly Budgets</summary>
+        <div id="budgetInputs"></div>
+        <button onclick="saveBudgets()">Save Budgets</button>
+      </details>
+
+      <!-- Table -->
+      <section class="table-container">
+        <table id="expenseTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <!-- Charts -->
+      <section class="charts">
+        <h3>Spending Trends</h3>
+        <canvas id="pieChart"></canvas>
+        <canvas id="lineChart"></canvas>
+        <canvas id="trendChart"></canvas>
+      </section>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
