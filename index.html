@@ -3,107 +3,85 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Aurum • Expense Tracker</title>
+  <title>Aurum Cloud • Smart Finance</title>
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@200;300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@200;300;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
 </head>
 <body class="light">
-  <div class="app-container">
+  <div class="container">
 
     <!-- Top Bar -->
     <header class="topbar">
       <h1>Aurum</h1>
-      <div class="topbar-actions">
-        <button id="themeToggle" class="icon-btn"><i class="fas fa-moon"></i></button>
-        <div class="profile-circle">
-          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=You" alt="You" />
-        </div>
+      <div class="actions">
+        <button id="themeBtn"><i class="fas fa-moon"></i></button>
+        <button id="currencyBtn">৳ BDT</button>
+        <button id="menuBtn"><i class="fas fa-ellipsis-v"></i></button>
       </div>
     </header>
 
-    <!-- Onboarding -->
-    <div id="onboarding" class="overlay">
-      <div class="glass-card">
-        <h2>Welcome to Aurum</h2>
-        <p>Your private financial companion.</p>
-        <button class="gold-btn" onclick="closeOnboarding()">Begin</button>
+    <!-- Currency Modal -->
+    <div id="currencyModal" class="modal">
+      <div class="modal-content">
+        <h3>Choose Currency</h3>
+        <button onclick="setCurrency('BDT', '৳')">৳ BDT - Bangladeshi Taka</button>
+        <button onclick="setCurrency('INR', '₹')">₹ INR - Indian Rupee</button>
+        <button onclick="setCurrency('USD', '$')">$ USD - US Dollar</button>
+        <button onclick="setCurrency('EUR', '€')">€ EUR - Euro</button>
       </div>
     </div>
 
-    <!-- Login -->
-    <section id="loginSection" class="auth-card">
-      <div class="glass-card">
-        <h2>Sign In</h2>
-        <input type="email" id="emailInput" placeholder="you@domain.com" />
-        <button class="gold-btn" onclick="login()">Continue</button>
-        <p>Your data stays private • Local + Encrypted</p>
+    <!-- Dashboard -->
+    <main>
+      <div class="balance-card glass">
+        <p>Available Balance</p>
+        <h1 id="balance">৳ 0</h1>
+        <div class="gold-line"></div>
       </div>
-    </section>
 
-    <!-- Main App -->
-    <main id="appSection" style="display:none">
-
-      <!-- Dashboard Cards -->
-      <section class="dashboard">
-        <div class="glass-card balance-card">
-          <p>Monthly Balance</p>
-          <h2><span id="balance">₹0</span></h2>
-          <div class="gold-underline"></div>
+      <div class="grid">
+        <div class="card glass" onclick="showHistory()">
+          <i class="fas fa-history"></i>
+          <p>Full History</p>
+          <strong id="totalTx">0</strong> expenses
         </div>
-
-        <div class="glass-card summary-card">
-          <canvas id="pieChart"></canvas>
-          <div class="legend" id="pieLegend"></div>
-        </div>
-
-        <div class="glass-card prediction-card">
-          <div class="ai-icon"><i class="fas fa-brain"></i></div>
-          <p>Next Month Projection</p>
-          <h3><span id="predictedSpend">Calculating…</span></h3>
-          <small>AI Forecast • ForecastAPI</small>
-        </div>
-      </section>
-
-      <!-- Quick Add FAB -->
-      <button class="fab" onclick="openQuickAdd()"><i class="fas fa-plus"></i></button>
-
-      <!-- Quick Add Modal -->
-      <div id="quickAddModal" class="modal">
-        <div class="glass-card">
-          <h3>Quick Add</h3>
-          <div class="quick-buttons">
-            <button onclick="quickAdd('Food',120)">Food</button>
-            <button onclick="quickAdd('Transport',80)">Transport</button>
-            <button onclick="quickAdd('Snacks',50)">Snacks</button>
-            <button onclick="quickAdd('Recharge',299)">Recharge</button>
-          </div>
-          <button class="gold-btn full" onclick="closeQuickAdd()">Close</button>
+        <div class="card glass">
+          <i class="fas fa-brain"></i>
+          <p>Next Month</p>
+          <strong id="prediction">Calculating...</strong>
         </div>
       </div>
 
-      <!-- Full Add Form -->
-      <section class="add-form glass-card">
-        <h3>Add Transaction</h3>
-        <select id="type"><option value="expense">Expense</option><option value="income">Income</option></select>
-        <input type="text" id="description" placeholder="Description" />
-        <input type="text" id="category" placeholder="Category" list="catList" />
-        <datalist id="catList"></datalist>
-        <input type="number" id="amount" placeholder="Amount" />
-        <input type="date" id="date" />
-        <label><input type="checkbox" id="recurring"> Recurring Monthly</label>
-        <button class="gold-btn" onclick="addTransaction()">Save</button>
-      </section>
+      <!-- Quick Add -->
+      <button class="fab" id="fabBtn">+</button>
 
-      <!-- Recent Transactions -->
-      <section class="transactions glass-card">
-        <h3>Recent</h3>
-        <table id="expenseTable"><tbody></tbody></table>
-      </section>
+      <!-- Add Form -->
+      <div id="addForm" class="form-modal">
+        <div class="glass form">
+          <h3>Add Expense</h3>
+          <input type="text" id="desc" placeholder="Description" />
+          <input type="text" id="cat" placeholder="Category" list="cats" />
+          <datalist id="cats">
+            <option>Food</option><option>Transport</option><option>Snacks</option>
+            <option>Recharge</option><option>Mess Bill</option><option>Shopping</option>
+          </datalist>
+          <input type="number" id="amt" placeholder="Amount" />
+          <input type="date" id="date" />
+          <button class="gold-btn" onclick="addExpense()">Save</button>
+        </div>
+      </div>
 
-      <!-- Analytics Link -->
-      <button class="gold-btn full" onclick="location.href='analytics.html'">View Full Analytics →</button>
+      <!-- History Page -->
+      <div id="historyPage" class="page">
+        <div class="topbar">
+          <button onclick="showDashboard()">Back</button>
+          <h2>Full History</h2>
+        </div>
+        <input type="text" id="search" placeholder="Search expenses..." oninput="filterHistory()" />
+        <div id="historyList"></div>
+      </div>
     </main>
   </div>
 
