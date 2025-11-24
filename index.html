@@ -3,84 +3,72 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Aurum Cloud • Smart Finance</title>
+  <title>Aurum • Cloud Sync</title>
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@200;300;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
 </head>
 <body class="light">
-  <div class="container">
 
-    <!-- Top Bar -->
+  <!-- Login Screen -->
+  <div id="authScreen" class="screen active">
+    <div class="glass auth-box">
+      <h1>Aurum</h1>
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Password" />
+      <button class="gold-btn" onclick="signup()">Sign Up</button>
+      <button onclick="login()">Log In</button>
+      <p id="authMsg"></p>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="appScreen" class="screen">
     <header class="topbar">
       <h1>Aurum</h1>
-      <div class="actions">
-        <button id="themeBtn"><i class="fas fa-moon"></i></button>
+      <div>
+        <span id="userEmail"></span>
+        <button onclick="logout()">Log out</button>
         <button id="currencyBtn">৳ BDT</button>
-        <button id="menuBtn"><i class="fas fa-ellipsis-v"></i></button>
       </div>
     </header>
 
-    <!-- Currency Modal -->
-    <div id="currencyModal" class="modal">
-      <div class="modal-content">
-        <h3>Choose Currency</h3>
-        <button onclick="setCurrency('BDT', '৳')">৳ BDT - Bangladeshi Taka</button>
-        <button onclick="setCurrency('INR', '₹')">₹ INR - Indian Rupee</button>
-        <button onclick="setCurrency('USD', '$')">$ USD - US Dollar</button>
-        <button onclick="setCurrency('EUR', '€')">€ EUR - Euro</button>
-      </div>
-    </div>
-
-    <!-- Dashboard -->
     <main>
       <div class="balance-card glass">
-        <p>Available Balance</p>
+        <p>Balance</p>
         <h1 id="balance">৳ 0</h1>
-        <div class="gold-line"></div>
       </div>
 
       <div class="grid">
-        <div class="card glass" onclick="showHistory()">
-          <i class="fas fa-history"></i>
-          <p>Full History</p>
-          <strong id="totalTx">0</strong> expenses
+        <div class="card glass">
+          <p>Total Expenses</p>
+          <strong id="count">0</strong>
         </div>
         <div class="card glass">
-          <i class="fas fa-brain"></i>
-          <p>Next Month</p>
-          <strong id="prediction">Calculating...</strong>
+          <p>Next Month AI</p>
+          <strong id="prediction">...</strong>
         </div>
       </div>
 
-      <!-- Quick Add -->
-      <button class="fab" id="fabBtn">+</button>
+      <button class="fab" onclick="showAdd()">+</button>
 
       <!-- Add Form -->
-      <div id="addForm" class="form-modal">
+      <div id="addModal" class="modal">
         <div class="glass form">
-          <h3>Add Expense</h3>
           <input type="text" id="desc" placeholder="Description" />
           <input type="text" id="cat" placeholder="Category" list="cats" />
           <datalist id="cats">
-            <option>Food</option><option>Transport</option><option>Snacks</option>
-            <option>Recharge</option><option>Mess Bill</option><option>Shopping</option>
+            <option>Food</option><option>Transport</option><option>Mess Bill</option>
+            <option>Recharge</option><option>Shopping</option>
           </datalist>
           <input type="number" id="amt" placeholder="Amount" />
-          <input type="date" id="date" />
-          <button class="gold-btn" onclick="addExpense()">Save</button>
+          <button class="gold-btn" onclick="saveExpense()">Save</button>
+          <button onclick="hideAdd()">Cancel</button>
         </div>
       </div>
-
-      <!-- History Page -->
-      <div id="historyPage" class="page">
-        <div class="topbar">
-          <button onclick="showDashboard()">Back</button>
-          <h2>Full History</h2>
-        </div>
-        <input type="text" id="search" placeholder="Search expenses..." oninput="filterHistory()" />
-        <div id="historyList"></div>
       </div>
     </main>
   </div>
