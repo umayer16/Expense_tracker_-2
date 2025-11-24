@@ -1,79 +1,214 @@
-// script.js
-const firebaseConfig = window.firebaseConfig; // from firebaseConfig.js
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
+// script.js — AURUM ULTIMATE: FULLY CLOUD-SYNCED + ALL FEATURES
+// Works with Firebase Modular SDK v12.6.0 (no build tools needed)
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBX4W9VMWulR_SkawcPsSs0eTC7igH09ms",
+  authDomain: "aurum-cloud.firebaseapp.com",
+  projectId: "aurum-cloud",
+  storageBucket: "aurum-cloud.firebasestorage.app",
+  messagingSenderId: "999926729828",
+  appId: "1:999926729828:web:636c14afe371f2b526e371"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 let user = null;
 let expenses = [];
 let currency = "BDT";
 let symbol = "৳";
-const rates = { BDT:1, INR:0.73, USD:0.0085, EUR:0.0078 };
+const rates = { BDT: 1, INR: 0.73, USD: 0.0085, EUR: 0.0078, GBP: 0.0072 };
+const symbols = { BDT: "৳", INR: "₹", USD: "$", EUR: "€", GBP: "£" };
 
-function login() {
-  const email = document.getElementById("email").value;
+// === AUTH STATE ===
+onAuthStateChanged(auth, (u) => {
+  if (u) {
+    user = u;
+    document.getElementById("userDisplay").textContent = u.email.split("@")[0];
+    document.getElementById("authScreen").classList.remove("active");
+    document.getElementById("appScreen").classList.add("active");
+    loadExpenses();
+  } else {
+    document.getElementById("authScreen").classList.add("active");
+    document.getElementById("appScreen").classList.remove("active");
+  }
+});
+
+// === LOGIN / SIGNUP / LOGOUT ===
+window.login = () => {
+  const email = document.getElementById("email").value.trim();
   const pass = document.getElementById("password").value;
-  auth.signInWithEmailAndPassword(email, pass)
-    .then(cred => loadUser(cred.user))
-    .catch(err => document.getElementById("authMsg").textContent = err.message);
-}
+  signInWithEmailAndPassword(auth, email, pass)
+    .catch(err => document.getElementById("authError").textContent = err.message);
+};
 
-function signup() {
-  const email = document.getElementById("email").value;
+window.signup = () => {
+  const email = document.getElementById("email").value.trim();
   const pass = document.getElementById("password").value;
-  auth.createUserWithEmailAndPassword(email, pass)
-    .then(cred => loadUser(cred.user))
-    .catch(err => document.getElementById("authMsg").textContent = err.message);
-}
+  createUserWithEmailAndPassword(auth, email, pass)
+    .catch(err => document.getElementById("authError").textContent = err.message);
+};
 
-function logout() {
-  auth.signOut();
-  location.reload();
-}
+window.logout = () => signOut(auth);
 
-function loadUser(u) {
-  user = u;
-  document.getElementById("userEmail").textContent = u.email;
-  document.getElementById("authScreen").classList.remove("active");
-  document.getElementById("appScreen").classList.add("active");
-
-  // Real-time listener
-  db.collection("users").doc(u.uid).collection("expenses")
-    .orderBy("date", "desc")
-    .onSnapshot(snapshot => {
-      expenses = [];
-      snapshot.forEach(doc => expenses.push({id: doc.id, ...doc.data()}));
-      updateUI();
-    });
-}
-
-function saveExpense() {
-  const desc = document.getElementById("desc").value || "Expense";
-  const cat = document.getElementById("cat").value || "Other";
-  const amt = parseFloat(document.getElementById("amt").value);
-  if (!amt) return;
-
-  db.collection("users").doc(user.uid).collection("expenses").add({
-    desc, cat, amt, date: new Date().toISOString().slice(0,10)
-  }).then(() => {
-    document.getElementById("addModal").classList.remove("active");
-    document.getElementById("desc").value = document.getElementById("cat").value = document.getElementById("amt").value = "";
+// === LOAD EXPENSES (Real-time) ===
+function loadExpenses() {
+  const q = query(collection(db, "users", user.uid, "expenses"), orderBy("timestamp", "desc"));
+  onSnapshot(q, (snapshot) => {
+    expenses = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    updateAllUI();
   });
 }
 
-function updateUI() {
-  const total = expenses.reduce((s,e) => s + e.amt, 0);
-  document.getElementById("balance").textContent = `${symbol} ${(total * rates[currency]).toFixed(0)}`;
-  document.getElementById("count").textContent = expenses.length;
-  document.getElementById("prediction").textContent = `${symbol} ${Math.round(total * 1.2 * rates[currency])}`;
+// === SAVE EXPENSE ===
+window.saveExpense = async () => {
+  const desc = document.getElementById("desc").value.trim() || "Expense";
+  const cat = document.getElementById("cat").value.trim() || "Other";
+  const amt = parseFloat(document.getElementById("amt").value);
+  if (!amt || amt <= 0) return alert("Please enter a valid amount");
+
+  await addDoc(collection(db, "users", user.uid, "expenses"), {
+    desc,
+    cat,
+    amt,
+    timestamp: serverTimestamp()
+  });
+
+  document.getElementById("desc").value = "";
+  document.getElementById("cat").value = "";
+  document.getElementById("amt").value = "";
+  closeAddModal();
+};
+
+// === UPDATE ENTIRE UI ===
+function updateAllUI() {
+  const total = expenses.reduce((s, e) => s + e.amt, 0);
+  const converted = (total * rates[currency]).toFixed(0);
+
+  document.getElementById("totalSpent").textContent = `${symbol} ${Number(converted).toLocaleString()}`;
+  document.getElementById("expenseCount").textContent = expenses.length;
+  document.getElementById("cardAmount").textContent = `${symbol} ${Number(converted).toLocaleString()}`;
+
+  // Top Category & Personality
+  const catTotals = expenses.reduce((a, e) => (a[e.cat] = (a[e.cat] || 0) + e.amt, a), {});
+  const topCat = Object.keys(catTotals).sort((a, b) => catTotals[b] - catTotals[a])[0] || "None";
+  document.getElementById("topCategory").textContent = topCat;
+
+  const personalityMap = {
+    Food: "Mess Food Lover", Snacks: "Fuchka Champion", Transport: "Ride-Share Addict",
+    Recharge: "Data King", Shopping: "Daraz Addict", "Mess Bill": "Hostel Pro"
+  };
+  document.getElementById("personalityLabel").textContent = personalityMap[topCat] || "Smart Saver";
+
+  // AI Prediction
+  const predicted = Math.round(total * 1.15 * rates[currency]);
+  document.getElementById("nextMonthAI").textContent = `${symbol} ${predicted.toLocaleString()}`;
+
+  // AI Roast
+  let roast = "You're doing great! Keep saving";
+  if (topCat === "Snacks" && catTotals.Snacks > 1200) roast = `Bro… ৳${catTotals.Snacks.toLocaleString()} on fuchka? Are you okay?`;
+  else if (topCat === "Food" && catTotals.Food > 6000) roast = `Biriyani count this month: Too high to count`;
+  document.getElementById("roastText").textContent = roast;
+
+  // Streak
+  const dates = [...new Set(expenses.map(e => new Date(e.timestamp?.seconds * 1000 || Date.now()).toISOString().slice(0,10)))].sort().reverse();
+  let streak = 0;
+  for (let i = 0; i < 100; i++) {
+    const d = new Date(Date.now() - i * 86400000).toISOString().slice(0,10);
+    if (dates.includes(d)) streak++;
+    else if (i > 0) break;
+  }
+  document.getElementById("streakCount").textContent = `${streak} Day Streak`;
+
+  renderHistory();
 }
 
-function showAdd() { document.getElementById("addModal").classList.add("active"); }
-function hideAdd() { document.getElementById("addModal").classList.remove("active"); }
+// === RENDER HISTORY ===
+function renderHistory() {
+  const list = document.getElementById("historyList");
+  list.innerHTML = "";
+  expenses.forEach(e => {
+    const date = e.timestamp ? new Date(e.timestamp.seconds * 1000).toLocaleDateString() : "Today";
+    const div = document.createElement("div");
+    div.className = "glass history-item";
+    div.innerHTML = `
+      <div>
+        <strong>${e.desc}</strong><br>
+        <small>${e.cat} • ${date}</small>
+      </div>
+      <div style="text-align:right">
+        <strong>${symbol} ${(e.amt * rates[currency]).toFixed(0)}</strong><br>
+        <button class="delete-btn" onclick="deleteExpense('${e.id}')">Delete</button>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
 
+window.deleteExpense = async (id) => {
+  if (confirm("Delete this expense permanently?")) {
+    await deleteDoc(doc(db, "users", user.uid, "expenses", id));
+  }
+};
+
+// === VIRAL SHARE FEATURES ===
+window.shareSummary = () => {
+  html2canvas(document.getElementById("shareCard")).then(canvas => {
+    canvas.toBlob(blob => {
+      const file = new File([blob], "aurum-summary.png", { type: "image/png" });
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: "My Aurum Summary" });
+      } else {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "aurum-summary.png";
+        a.click();
+      }
+    });
+  });
+};
+
+window.shareRoast = () => {
+  const text = document.getElementById("roastText").textContent;
+  if (navigator.share) {
+    navigator.share({ text: `Aurum Roast: ${text}\nGet yours → https://aurum-ultimate.vercel.app` });
+  }
+};
+
+// === CURRENCY SWITCHER ===
 document.getElementById("currencyBtn").onclick = () => {
-  const c = prompt("Enter currency code: BDT, INR, USD, EUR", currency);
-  if (rates[c]) { currency = c; symbol = {BDT:"৳",INR:"₹",USD:"$",EUR:"€"}[c]; }
-  document.getElementById("currencyBtn").textContent = `${symbol} ${currency}`;
-  updateUI();
+  const input = prompt("Enter currency: BDT, INR, USD, EUR, GBP", currency);
+  const code = input?.toUpperCase();
+  if (rates[code]) {
+    currency = code;
+    symbol = symbols[code];
+    document.getElementById("currencyBtn").textContent = `${symbol} ${currency}`;
+    updateAllUI();
+  }
+};
+
+// === UI HELPERS ===
+window.openAddModal = () => document.getElementById("addModal").classList.add("active");
+window.closeAddModal = () => document.getElementById("addModal").classList.remove("active");
+window.showPage = (id) => {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+};
+
+window.toggleTheme = () => {
+  document.body.classList.toggle("light");
+  document.body.classList.toggle("dark");
+};
+
+window.filterHistory = () => {
+  const term = document.getElementById("searchInput").value.toLowerCase();
+  document.querySelectorAll(".history-item").forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(term) ? "flex" : "none";
+  });
 };
