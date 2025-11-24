@@ -1,146 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Hostel Expense Tracker</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aurum • Expense Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@200;300;400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 </head>
-<body>
-  <div class="container">
-    <header>
-      <h1><i class="fas fa-wallet"></i> Smart Expense Tracker</h1>
-      <div class="header-actions">
-        <button id="themeToggle"><i class="fas fa-moon"></i></button>
-        <button id="onboardingBtn"><i class="fas fa-question-circle"></i></button>
+<body class="light">
+  <div class="app-container">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <h1>Aurum</h1>
+      <div class="topbar-actions">
+        <button id="themeToggle" class="icon-btn"><i class="fas fa-moon"></i></button>
+        <div class="profile-circle">
+          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=You" alt="You" />
+        </div>
       </div>
     </header>
 
-    <!-- Onboarding Overlay -->
+    <!-- Onboarding -->
     <div id="onboarding" class="overlay">
-      <div class="onboarding-content">
-        <h2>Welcome! Let's get started</h2>
-        <p>Add expenses easily, set budgets, track streaks, and stay in control!</p>
-        <ol>
-          <li>Log in with your email</li>
-          <li>Use Quick Add buttons</li>
-          <li>Set monthly budgets</li>
-          <li>Earn streaks by logging daily!</li>
-          <li><strong>New:</strong> Get AI predictions for next month's spending!</li>
-        </ol>
-        <button onclick="closeOnboarding()">Got it!</button>
+      <div class="glass-card">
+        <h2>Welcome to Aurum</h2>
+        <p>Your private financial companion.</p>
+        <button class="gold-btn" onclick="closeOnboarding()">Begin</button>
       </div>
     </div>
 
     <!-- Login -->
-    <section id="loginSection">
-      <h2>Login to Continue</h2>
-      <input type="email" id="emailInput" placeholder="your@email.com">
-      <button onclick="login()">Login / Sign Up</button>
-      <p><small>Your data is private & stored locally</small></p>
+    <section id="loginSection" class="auth-card">
+      <div class="glass-card">
+        <h2>Sign In</h2>
+        <input type="email" id="emailInput" placeholder="you@domain.com" />
+        <button class="gold-btn" onclick="login()">Continue</button>
+        <p>Your data stays private • Local + Encrypted</p>
+      </div>
     </section>
 
     <!-- Main App -->
-    <div id="appSection" style="display:none;">
-      <div class="user-info">
-        <p>Hi, <strong id="userEmail"></strong>! 
-          <span id="streak">Streak: 0 🔥</span>
-        </p>
-        <button id="logoutBtn">Logout</button>
-      </div>
+    <main id="appSection" style="display:none">
 
-      <!-- Quick Stats -->
-      <div class="dashboard">
-        <div class="card"><strong>Total Spent</strong><span id="totalSpent">₹0</span></div>
-        <div class="card"><strong>Income</strong><span id="totalIncome">₹0</span></div>
-        <div class="card"><strong>Balance</strong><span id="balance">₹0</span></div>
-        <div class="card warning" id="budgetStatus">On Track</div>
-        <!-- New: AI Predictions Card -->
-        <div class="card ai-prediction" id="predictionCard">
-          <strong>AI Next Month Prediction</strong>
-          <span id="predictedSpend">Loading...</span>
-          <small><i class="fas fa-brain"></i> Powered by ForecastAPI</small>
+      <!-- Dashboard Cards -->
+      <section class="dashboard">
+        <div class="glass-card balance-card">
+          <p>Monthly Balance</p>
+          <h2><span id="balance">₹0</span></h2>
+          <div class="gold-underline"></div>
+        </div>
+
+        <div class="glass-card summary-card">
+          <canvas id="pieChart"></canvas>
+          <div class="legend" id="pieLegend"></div>
+        </div>
+
+        <div class="glass-card prediction-card">
+          <div class="ai-icon"><i class="fas fa-brain"></i></div>
+          <p>Next Month Projection</p>
+          <h3><span id="predictedSpend">Calculating…</span></h3>
+          <small>AI Forecast • ForecastAPI</small>
+        </div>
+      </section>
+
+      <!-- Quick Add FAB -->
+      <button class="fab" onclick="openQuickAdd()"><i class="fas fa-plus"></i></button>
+
+      <!-- Quick Add Modal -->
+      <div id="quickAddModal" class="modal">
+        <div class="glass-card">
+          <h3>Quick Add</h3>
+          <div class="quick-buttons">
+            <button onclick="quickAdd('Food',120)">Food</button>
+            <button onclick="quickAdd('Transport',80)">Transport</button>
+            <button onclick="quickAdd('Snacks',50)">Snacks</button>
+            <button onclick="quickAdd('Recharge',299)">Recharge</button>
+          </div>
+          <button class="gold-btn full" onclick="closeQuickAdd()">Close</button>
         </div>
       </div>
 
-      <!-- Quick Add Buttons -->
-      <div class="quick-add">
-        <button onclick="quickAdd('Food', 80)">Food</button>
-        <button onclick="quickAdd('Transport', 50)">Transport</button>
-        <button onclick="quickAdd('Snacks', 30)">Snacks</button>
-        <button onclick="quickAdd('Recharge', 199)">Recharge</button>
-      </div>
-
-      <!-- Add Transaction -->
-      <section class="add-form">
+      <!-- Full Add Form -->
+      <section class="add-form glass-card">
         <h3>Add Transaction</h3>
-        <select id="type">
-          <option value="expense">Expense</option>
-          <option value="income">Income</option>
-        </select>
-        <input type="text" id="description" placeholder="Description (e.g. Mess Fee)">
-        <input type="text" id="category" placeholder="Category" list="catList">
+        <select id="type"><option value="expense">Expense</option><option value="income">Income</option></select>
+        <input type="text" id="description" placeholder="Description" />
+        <input type="text" id="category" placeholder="Category" list="catList" />
         <datalist id="catList"></datalist>
-        <input type="number" id="amount" placeholder="Amount">
-        <input type="date" id="date">
-        <label><input type="checkbox" id="recurring"> Recurring (Monthly)</label>
-        <button onclick="addTransaction()">Add</button>
+        <input type="number" id="amount" placeholder="Amount" />
+        <input type="date" id="date" />
+        <label><input type="checkbox" id="recurring"> Recurring Monthly</label>
+        <button class="gold-btn" onclick="addTransaction()">Save</button>
       </section>
 
-      <!-- Search & Filters -->
-      <div class="filters">
-        <input type="text" id="search" placeholder="Search transactions...">
-        <select id="filterCategory"><option value="">All Categories</option></select>
-        <select id="filterType"><option value="">All Types</option></select>
-        <button onclick="exportCSV()">Export CSV</button>
-        <label class="import-label">
-          Import CSV <input type="file" id="importFile" accept=".csv">
-        </label>
-        <!-- New: API Key Setup -->
-        <details>
-          <summary><i class="fas fa-key"></i> AI Setup (Optional)</summary>
-          <input type="text" id="apiKeyInput" placeholder="Enter ForecastAPI Key">
-          <button onclick="saveApiKey()">Save Key</button>
-          <small>Get free key at <a href="https://forecastapi.com/" target="_blank">forecastapi.com</a></small>
-        </details>
-      </div>
-
-      <!-- Budget Settings -->
-      <details class="budget-settings">
-        <summary><i class="fas fa-cog"></i> Set Monthly Budgets</summary>
-        <div id="budgetInputs"></div>
-        <button onclick="saveBudgets()">Save Budgets</button>
-      </details>
-
-      <!-- Table -->
-      <section class="table-container">
-        <table id="expenseTable">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Description</th>
-              <th>Category</th>
-              <th>Type</th>
-              <th>Amount</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+      <!-- Recent Transactions -->
+      <section class="transactions glass-card">
+        <h3>Recent</h3>
+        <table id="expenseTable"><tbody></tbody></table>
       </section>
 
-      <!-- Charts -->
-      <section class="charts">
-        <h3>Spending Trends</h3>
-        <canvas id="pieChart"></canvas>
-        <canvas id="lineChart"></canvas>
-        <canvas id="trendChart"></canvas>
-        <!-- New: Prediction Chart Extension -->
-        <canvas id="predictionChart"></canvas>
-      </section>
-    </div>
+      <!-- Analytics Link -->
+      <button class="gold-btn full" onclick="location.href='analytics.html'">View Full Analytics →</button>
+    </main>
   </div>
 
   <script src="script.js"></script>
