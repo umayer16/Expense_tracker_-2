@@ -1,9 +1,15 @@
-// ←←← CREATE THIS FILE EXACTLY ←←←
+// firebaseConfig.js
+// Aurum Web – Official Firebase Configuration
+// Project: aurum-cloud | App ID: 1:999926729828:web:636c14afe371f2b526e371
+
 const firebaseConfig = {
-  apiKey: "AIzaSyD8fY8sKz1jX9vL5mPqW2nR7tYcV4bN0pQ",
-  authDomain: "aurum-cloud-expenses.firebaseapp.com",
-  projectId: "aurum-cloud-expenses",
-  storageBucket: "aurum-cloud-expenses.appspot.com",
-  messagingSenderId: "487654321987",
-  appId: "1:487654321987:web:a1b2c3d4e5f6g7h8i9j0"
+  apiKey: "AIzaSyBX4W9VMWulR_SkawcPsSs0eTC7igH09ms",
+  authDomain: "aurum-cloud.firebaseapp.com",
+  projectId: "aurum-cloud",
+  storageBucket: "aurum-cloud.firebasestorage.app",
+  messagingSenderId: "999926729828",
+  appId: "1:999926729828:web:636c14afe371f2b526e371",
+  measurementId: "G-TFG7TW6YJT"
 };
+
+export default firebaseConfig;
